@@ -11,8 +11,32 @@ package java_qtree;
  */
 public class cifsSharePermissions {
 
-    String share;
-    String sid;
-    String access;
+    private String share;
+    private String sid;
+    private String access;
+
+    public String getShare() {
+        return share;
+    }
+
+    public void setShare(String share) {
+        this.share = share;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+    public void setSid(String sid) {
+        this.sid = sid;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
+    }
 
 }

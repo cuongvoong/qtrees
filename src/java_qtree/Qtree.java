@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 
 /**
  *
@@ -25,12 +27,24 @@ import java.util.regex.Pattern;
  */
 public class Qtree {
 
-    public String readFile(String host, String username, String password, String filename) {
+    public String readFile(String filename) {
 
-        String SFTPHOST = host;
+        String fullhost;
+        fullhost = JOptionPane.showInputDialog("Enter username@hostname", "username@hostname");
+        String SFTPUSER = fullhost.substring(0, fullhost.indexOf('@'));
+        String SFTPHOST = fullhost.substring(fullhost.indexOf('@') + 1);
+        String SFTPPASS = null;
+
         int SFTPPORT = 22;
-        String SFTPUSER = username;
-        String SFTPPASS = password;
+        //String SFTPUSER = username;
+        //String SFTPPASS = password;
+
+        JPasswordField pf = new JPasswordField();
+        int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (okCxl == JOptionPane.OK_OPTION) {
+            SFTPPASS = new String(pf.getPassword());
+        }
 
         Session session = null;
         Channel channel = null;
@@ -63,12 +77,12 @@ public class Qtree {
     }
 
     public List readCifsShares(String cifsShareFile) {
-        
+
         List<String> list = new ArrayList<>();
         List<cifsShareDefinition> volumes = new ArrayList<>();
-        
+
         Scanner scanner = new Scanner(cifsShareFile);
-        
+
         while (scanner.hasNextLine()) {
             list.add(scanner.nextLine());
         }
@@ -89,74 +103,67 @@ public class Qtree {
 
                 if (matcher.find()) {
                     cifsShareDefinition definition = new cifsShareDefinition();
-                    definition.volume = matcher.group(1);
-                    definition.qtree = matcher.group(2);
-                    definition.subdirectories = matcher.group(4);
-                    definition.line_number = line_number;
+                    definition.setVolume(matcher.group(1));
+                    definition.setQtree(matcher.group(2));
+                    definition.setSubdirectories(matcher.group(4));
+                    definition.setLine_number(line_number);
                     volumes.add(definition);
                 }
             }
         }
-        
+
         return volumes;
     }
-    
+
     public List readCifsPermissions(String cifsShareFile) {
-        
+
         List<String> list = new ArrayList<>();
         List<cifsSharePermissions> permissions = new ArrayList<>();
-        
+
         Scanner scanner = new Scanner(cifsShareFile);
-        
+
         while (scanner.hasNextLine()) {
             list.add(scanner.nextLine());
         }
         scanner.close();
-        
-        for(String i : list)
-        {
+
+        for (String i : list) {
             Pattern pattern = Pattern.compile(".*cifs access\\s\"([^\"]*)\"\\s([^\\s]*|[eE]veryone)\\s([^\n]+)");
             Matcher matcher = pattern.matcher(i);
-        
-            if(matcher.find())
-            {
+
+            if (matcher.find()) {
                 cifsSharePermissions permission = new cifsSharePermissions();
-                permission.share = matcher.group(1);
-                permission.sid = matcher.group(2);
-                permission.access = matcher.group(3).replace("\"", "");
+                permission.setShare(matcher.group(1));
+                permission.setSid(matcher.group(2));
+                permission.setAccess(matcher.group(3).replace("\"", ""));
                 permissions.add(permission);
             }
         }
-        
+
         return permissions;
     }
-    
-    public HashMap getVolumesQtreesMapping(String volumeQtreeMappingFile)
-    {
+
+    public HashMap getVolumesQtreesMapping(String volumeQtreeMappingFile) {
         List<String> list = new ArrayList<>();
         List<String> qtreeList;
         HashMap<String, HashSet<String>> volumeQtrees = new HashMap<>();
-        
+
         Scanner scanner = new Scanner(volumeQtreeMappingFile);
-        
+
         while (scanner.hasNextLine()) {
             list.add(scanner.nextLine());
         }
         scanner.close();
-        
-        for(String i : list)
-        {
+
+        for (String i : list) {
             qtreeList = Arrays.asList(i.split(","));
 
-            if(volumeQtrees.get(qtreeList.get(0)) != null && !volumeQtrees.get(qtreeList.get(0)).isEmpty())
-            {
+            if (volumeQtrees.get(qtreeList.get(0)) != null && !volumeQtrees.get(qtreeList.get(0)).isEmpty()) {
                 HashSet<String> tempQtree = new HashSet<>();
                 tempQtree = volumeQtrees.get(qtreeList.get(0));
                 tempQtree.add(qtreeList.get(1));
                 volumeQtrees.put(qtreeList.get(0), tempQtree);
-            }
-            else
-            {
+            } else {
                 HashSet<String> qtrees = new HashSet<>();
                 qtrees.add(qtreeList.get(1));
                 volumeQtrees.put(qtreeList.get(0), qtrees);

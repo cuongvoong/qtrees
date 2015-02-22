@@ -25,22 +25,12 @@ public class Java_Qtree {
         
         String cifsconfig_file = "/home/cuong/cifsconfig_share.cfg";
         Qtree stuff = new Qtree();
-        String test = stuff.readFile("192.168.37.128", "cuong", "voong", cifsconfig_file);
-        
-        //System.out.println(test);
+        String test = stuff.readFile(cifsconfig_file);
 
-        //String cifsconfig_file = "C:\\Users\\cuong\\Documents\\NetBeansProjects\\Java_Qtree\\f6_cifsconfig_share.cfg.txt";
-        String qtrees_file = "C:\\Users\\cuong\\Documents\\NetBeansProjects\\Java_Qtree\\f6_volume_qtrees.txt";
-        
-        List<String> list = new ArrayList<>();
         List<cifsShareDefinition> volumes = new ArrayList<>();
         List<cifsSharePermissions> permissions = new ArrayList<>();
-        List<String> qtreeList;
-        HashSet<String> volumeNames = new HashSet<>();
-        HashMap<String, HashSet<String>> volumeQtrees = new HashMap<>();
 
         volumes = stuff.readCifsShares(test);
         permissions = stuff.readCifsPermissions(test);
-
     }
 }
